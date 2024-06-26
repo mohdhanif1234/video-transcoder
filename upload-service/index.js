@@ -19,7 +19,7 @@ app.get('/health', (req, res)=>{
     res.send('Everything seems fine')
 })
 
-app.use('/api/v1', uploadRouter)
+app.use('/api/v1/', uploadRouter)
 
 app.listen(port, ()=>{
     console.log(`Server is listening on port ${port}`)

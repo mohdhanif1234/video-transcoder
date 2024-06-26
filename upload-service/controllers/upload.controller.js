@@ -2,15 +2,20 @@ import AWS from 'aws-sdk';
 import fs from 'fs'
 
 export const uploadFileToS3 = async (req, res) => {
-    // console.log('upload file to s3')
-    // res.send('cool')
 
-    const filePath = '/Users/mohdhanif/practise/video-transcoder/upload-service/assets/images/360x249.jpeg'
+    const file = req.file;
 
-    if (!fs.existsSync(filePath)) {
-        console.log(`File does not exist in this path : ${filePath}`);
-        return;
+    if (!file) {
+        console.log('No file received');
+        return res.status(404).send('No file received')
     }
+
+    // const filePath = '/Users/mohdhanif/practise/video-transcoder/upload-service/assets/images/360x249.jpeg'
+
+    // if (!fs.existsSync(filePath)) {
+    //     console.log(`File does not exist in this path : ${filePath}`);
+    //     return;
+    // }
 
     AWS.config.update({
         region: 'ap-south-1',
@@ -18,16 +23,23 @@ export const uploadFileToS3 = async (req, res) => {
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
     })
 
+    // Generate folder name based on current date in DD/MM/YYYY format
+    const currentDate = new Date();
+    const folderName = `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`;
+
     const params = {
         Bucket: process.env.AWS_INPUT_BUCKET,
-        Key: '360x249.jpeg',
-        Body: fs.createReadStream(filePath)
+        Key: `${folderName}/${file.originalname}`, // Include folder structure in Key
+        Body: file.buffer
+        // Body: fs.createReadStream(filePath)
     }
 
     const s3 = new AWS.S3();
 
+    console.log('File upload to S3 starts...')
+
     s3.upload(params, (error, data) => {
-        if (err) {
+        if (error) {
             console.log(`Error occured while uploading the file: `, error);
             res.status(404).send('File could not be uploaded!');
         }
