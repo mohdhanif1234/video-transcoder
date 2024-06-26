@@ -1,5 +1,4 @@
 import AWS from 'aws-sdk';
-import { S3Client } from '@aws-sdk/client-s3'
 import fs from 'fs'
 
 export const uploadFileToS3 = async (req, res) => {
@@ -27,9 +26,9 @@ export const uploadFileToS3 = async (req, res) => {
 
     const s3 = new AWS.S3();
 
-    s3.upload(params, (err, data) => {
+    s3.upload(params, (error, data) => {
         if (err) {
-            console.log(`Error occured while uploading the file: `, err);
+            console.log(`Error occured while uploading the file: `, error);
             res.status(404).send('File could not be uploaded!');
         }
         else {
