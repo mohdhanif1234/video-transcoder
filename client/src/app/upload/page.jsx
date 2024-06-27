@@ -25,7 +25,7 @@ const UploadForm = () => {
         }
 
         try {
-            ////////////////////////////////////////////////////
+            // initializing multi part upload
             const formData = new FormData();
             formData.append('filename', e.target.files[0].name);
             const initializeRes = await axios.post(`${BASE_URL}/api/v1/initializeMultiPartUpload`, formData, {
@@ -37,7 +37,7 @@ const UploadForm = () => {
             const { uploadId } = initializeRes.data;
             console.log('Upload id is ', uploadId);
 
-            ////////////////////////////////////////////////////
+            // individual chunks upload
 
             const chunkSize = 10 * 1024 * 1024; // 10 MB chunks
             const totalChunks = Math.ceil(e.target.files[0].size / chunkSize);
@@ -69,8 +69,7 @@ const UploadForm = () => {
 
             await Promise.all(uploadPromises);
 
-            ////////////////////////////////////////////////////
-
+            // complete video upload to S3
 
             const completeRes = await axios.post(`${BASE_URL}/api/v1/completeUpload`, {
                 filename: e.target.files[0].name,
