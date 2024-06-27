@@ -1,4 +1,5 @@
 import AWS from 'aws-sdk'
+import {addVideoDetailsToDB} from '../db/index.js'
 
 // Initialize upload
 export const initializeMultipartUpload = async (req, res) => {
@@ -108,7 +109,7 @@ export const initializeMultipartUpload = async (req, res) => {
  
         console.log("data----- ", uploadResult);
  
-        // await addVideoDetailsToDB(title, description , author, uploadResult.Location);
+        await addVideoDetailsToDB(title, description , author, uploadResult.Location);
         // pushVideoForEncodingToKafka(title, uploadResult.Location);
         return res.status(200).send({ message: " File Uploaded successfully!!!" });
  
