@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import uploadRouter from './routes/upload.route.js'
 import kafkaPublisherRouter from './routes/kafkapublisher.route.js'
+import multipartUploadRouter from './routes/mutipartupload.route.js'
 
 dotenv.config();
 const app = express();
@@ -22,6 +23,7 @@ app.get('/health-upload', (req, res) => {
 
 app.use('/api/v1/', uploadRouter)
 app.use('/api/v1/', kafkaPublisherRouter)
+app.use('/api/v1/', multipartUploadRouter)
 
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`)

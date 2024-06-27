@@ -25,28 +25,70 @@ const UploadForm = () => {
         }
 
         try {
+            ////////////////////////////////////////////////////
             const formData = new FormData();
-            formData.append('file', e.target.files[0]);
-            const fileUploadResponse = await axios.post(`${BASE_URL}/api/v1/upload`, formData, {
+            formData.append('filename', e.target.files[0].name);
+            const initializeRes = await axios.post(`${BASE_URL}/api/v1/initializeMultiPartUpload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
-                },
-                onUploadProgress: (data) => {
-                    console.log(data.loaded, data.total)
-                    setUploadProgress(Math.round((data.loaded / data.total) * 100))
                 }
-
             }
-            )
+            );
+            const { uploadId } = initializeRes.data;
+            console.log('Upload id is ', uploadId);
 
-            if (fileUploadResponse.status === 200) {
-                setUploadProgress(0)
-                alert(fileUploadResponse.data);
-                router.push('/')
+            ////////////////////////////////////////////////////
 
+            const chunkSize = 10 * 1024 * 1024; // 10 MB chunks
+            const totalChunks = Math.ceil(e.target.files[0].size / chunkSize);
+
+            console.log('chunksize', chunkSize);
+            console.log('totalchunks', totalChunks)
+
+            let start = 0;
+            const uploadPromises = [];
+
+            for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+
+                const chunk = e.target.files[0].slice(start, start + chunkSize);
+                start += chunkSize;
+                const chunkFormData = new FormData();
+                chunkFormData.append('filename', e.target.files[0].name);
+                chunkFormData.append('chunk', chunk);
+                chunkFormData.append('totalChunks', totalChunks);
+                chunkFormData.append('chunkIndex', chunkIndex);
+                chunkFormData.append('uploadId', uploadId);
+
+                const uploadPromise = axios.post(`${BASE_URL}/api/v1/uploadChunk`, chunkFormData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+                uploadPromises.push(uploadPromise);
+            }
+
+            await Promise.all(uploadPromises);
+
+            ////////////////////////////////////////////////////
+
+
+            const completeRes = await axios.post(`${BASE_URL}/api/v1/completeUpload`, {
+                filename: e.target.files[0].name,
+                totalChunks,
+                uploadId,
+                title,
+                description,
+                author
+            });
+
+            console.log('Complete response data', completeRes.data);
+
+            if (completeRes.status === 200) {
+                alert(completeRes.data.message);
+                router.push('/');
             }
         } catch (error) {
-            console.error(error)
+            console.error('Error uploading file:', error);
         }
     };
 
