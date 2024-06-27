@@ -108,8 +108,12 @@ export const initializeMultipartUpload = async (req, res) => {
         const uploadResult = await s3.completeMultipartUpload(completeParams).promise();
  
         console.log("data----- ", uploadResult);
+
+        const signedUrl = await getSignedUrl(uploadResult.Key)
+
+        console.log(`Signed url is`, res)
  
-        await addVideoDetailsToDB(title, description , author, uploadResult.Location);
+        await addVideoDetailsToDB(title, description , author, signedUrl);
         // pushVideoForEncodingToKafka(title, uploadResult.Location);
         return res.status(200).send({ message: " File Uploaded successfully!!!" });
  
@@ -118,3 +122,28 @@ export const initializeMultipartUpload = async (req, res) => {
         return res.status(500).send('Upload completion failed');
     }
  };
+
+ export const getSignedUrl=(videoKey)=> {
+
+    const s3 = new AWS.S3({
+        accessKeyId: process.env.AWS_ACCESS_KEY,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        region: 'ap-south-1'
+    });
+ 
+    const params = {
+        Bucket: process.env.AWS_INPUT_BUCKET,
+        Key: videoKey,
+        Expires: 3600 // URL expires in 1 hour, adjust as needed
+    };
+ 
+    return new Promise((resolve, reject) => {
+        s3.getSignedUrl('getObject', params, (err, url) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(url);
+            }
+        });
+    });
+ }
