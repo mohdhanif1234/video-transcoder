@@ -1,13 +1,13 @@
-import {PrismaClient} from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 
-const prisma=new PrismaClient()
+const prisma = new PrismaClient()
 
-export const addVideoDetailsToDB=async(title, description, author, url)=>{
+export const addVideoDetailsToDB = async (title, description, author) => {
     const videoData = await prisma.videoData.create({
-        data:{
-            title, description, author, input_bucket_url: url
+        data: {
+            title, description, author
         }
     })
 
-    console.log(`Video meta data added to DB successfully: `, videoData)
+    return videoData
 }

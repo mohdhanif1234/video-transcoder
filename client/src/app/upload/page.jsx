@@ -17,8 +17,9 @@ const UploadForm = () => {
     const router = useRouter()
 
     const handleFileChange = async (e) => {
-        console.log(e.target.files)
+        console.log(e.target.files);
         // setSelectedFile(e.target.files[0]);
+
         if (!title || !author) {
             alert('Title and Author are required fields.');
             return;
@@ -34,8 +35,9 @@ const UploadForm = () => {
                 }
             }
             );
-            const { uploadId } = initializeRes.data;
+            const { uploadId, S3Key } = initializeRes.data;
             console.log('Upload id is ', uploadId);
+            console.log('Key is....', S3Key)
 
             // individual chunks upload
 
@@ -69,15 +71,16 @@ const UploadForm = () => {
 
             await Promise.all(uploadPromises);
 
-            // complete video upload to S3
+              // complete video upload to S3
 
-            const completeRes = await axios.post(`${BASE_URL}/api/v1/completeUpload`, {
+              const completeRes = await axios.post(`${BASE_URL}/api/v1/completeUpload`, {
                 filename: e.target.files[0].name,
                 totalChunks,
                 uploadId,
                 title,
                 description,
-                author
+                author,
+                S3Key
             });
 
             console.log('Complete response data', completeRes.data);
@@ -86,6 +89,69 @@ const UploadForm = () => {
                 alert(completeRes.data.message);
                 router.push('/');
             }
+
+            // // generate presigned urls
+            // let presignedUrls_response = await axios.post(`${BASE_URL}/api/v1/generatePresignedURLs`,
+            //     {
+            //         fileName: e.target.files[0].name,
+            //         uploadId: uploadId,
+            //         partNumbers: totalChunks,
+            //     }
+            // );
+
+            // let presigned_urls = presignedUrls_response?.data?.presignedUrls;
+
+            // console.log("Presigned urls- ", presigned_urls);
+
+            // // complete video upload to S3 after getting presigned urls for each individual chunk
+
+            // // upload the file into chunks to different presigned url
+            // let parts = [];
+            // const uploadPromises = [];
+
+            // for (let i = 0; i < totalChunks; i++) {
+            //     let start = i * chunkSize;
+            //     let end = Math.min(start + chunkSize, e.target.files[0].size);
+            //     let chunk = e.target.files[0].slice(start, end);
+            //     let presignedUrl = presigned_urls[i];
+
+            //     uploadPromises.push(
+            //         axios.put(presignedUrl, chunk, {
+            //             headers: {
+            //                 "Content-Type": "multipart/form-data",
+            //             },
+            //         })
+            //     );
+            // }
+
+            // const uploadResponses = await Promise.all(uploadPromises);
+
+            // console.log('Uploaded response----', uploadResponses)
+
+            // uploadResponses.forEach((response, i) => {
+            //     // existing response handling
+
+            //     parts.push({
+            //         etag: response.headers.etag,
+            //         PartNumber: i + 1,
+            //     });
+            // });
+
+            // console.log("Parts...... ", parts);
+
+            // // make a call to multipart complete api
+            // let complete_upload = await axios.post(
+            //     `${BASE_URL}/api/v1/completeMultipartUpload`,
+            //     {
+            //         fileName: e.target.files[0].name,
+            //         uploadId,
+            //         parts
+            //     }
+            // );
+
+            // console.log("Complete upload....... ", complete_upload);
+
+
         } catch (error) {
             console.error('Error uploading file:', error);
         }
