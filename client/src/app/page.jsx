@@ -3,6 +3,8 @@ import { useState } from "react";
 import dynamic from 'next/dynamic'
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 import Navbar from "@/components/Navbar";
+import VideoPlayer from "./pages/videoPlayer";
+import YouTubeHome from "./pages/youtubeHome";
 
 export default function Home() {
 
@@ -50,6 +52,8 @@ export default function Home() {
         </div>
 
       </div> */}
+      {/* <VideoPlayer/> */}
+      <YouTubeHome/>
     </>
   );
 }

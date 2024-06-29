@@ -11,7 +11,7 @@ const Navbar = () => {
           <div className="text-white text-lg font-semibold">Video Transcoder App</div>
 
 
-          <div className="flex-1 mx-4">
+          <div className="flex-1 mx-4 hidden">
             <input type="text" placeholder="Search..." className="w-1/3 px-4 py-2 rounded-lg bg-gray-700 text-white outline-none" />
           </div>
 
@@ -24,14 +24,14 @@ const Navbar = () => {
           </button>
 
 
-          <div className="flex items-center">
+          {/* <div className="flex items-center">
             <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg mr-2">
               Sign In
             </button>
             <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg">
               Sign Out
             </button>
-          </div>
+          </div> */}
         </div>
       </nav>
 
