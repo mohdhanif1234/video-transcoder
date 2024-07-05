@@ -1,0 +1,23 @@
+Hello everyone, I hope you're well. In the world of software development, designing scalable and robust systems is crucial, and to achieve this, we must apply various system design concepts such as HLD (High-Level Design), LLD (Low-Level Design), or both. While there are numerous systems out there, I recently completed an end-to-end video transcoding application. I couldn't have done it without the invaluable guidance of Piyush Garg and Keerti Purswani.
+
+Piyush Garg's latest video on his channel based on HLS and adaptive bitrate streaming sparked my interest and motivated me to implement this project. His thorough explanation of AWS concepts, particularly on S3 buckets, is a profound reservoir of knowledge. Additionally, Keerti Purswani's recent video, where she demonstrated the app and walked through its entire code, was incredibly insightful and served as a vast learning opportunity.
+
+Through this project, I've gained extensive knowledge in areas like distributed event streaming using Kafka, cloud storage with AWS S3, adaptive bitrate streaming, and HLS. I've also deepened my understanding on microservices architecture used in this project.
+
+If you're interested in the implementation details, Piyush's and Keerti's video on their channel breaks down the project step by step. I've also outlined the final architecture and high-level design in my post.
+
+Here's a brief overview of the project:
+
+1) The client uploads a video and its metadata, which is processed by an upload service and stored in an S3 input bucket. For large files, AWS S3's multipart upload feature breaks them into chunks for enhanced security using pre-signed URLs.
+
+2) Metadata like title, author etc are saved in a database, and a message is published to a Kafka topic by the upload service.
+
+3) A transcoder service acts as a consumer, downloading the video from S3, transcoding it into multiple resolutions, and uploading the results to an S3 output bucket. It generates a master m3u8 file containing the resolution information.
+
+4) A watch service allows clients to stream videos via an appropriate player using the m3u8 file.
+
+Tech stack used: NextJS, Express, Postgres, Prisma, Kafka, AWS S3, Aiven cloud (for service creation), ffmeg commands (for transcoding) and microservices architecture.
+
+Thank you for taking the time to read this post. If you'd like to explore the code further, you can find the GitHub repository link attached. Let's connect and continue learning together. Have a great day ahead!
+
+My Github repo link: https://github.com/mohdhanif1234/video-transcoder
